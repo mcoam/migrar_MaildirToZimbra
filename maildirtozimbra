@@ -5,8 +5,6 @@ path='/export8/mdir/1/5/mlopez@manquehue.net/Maildir'
 user=`echo $path |cut -d / -f6`
 usersubfolder="/var/tmp/$user.subfolder"
 userfolder="/var/tmp/$user.folder"
-usermail="/var/tmp/$user"
-sfmid="/var/tmp/correosDeSubFolder"
 
 #echo $userFolder
 
