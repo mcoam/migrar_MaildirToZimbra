@@ -3,27 +3,56 @@ path='/export8/mdir/1/5/mlopez@manquehue.net/Maildir'
 user=`echo $path |cut -d / -f6`
 #echo user
 find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | while read line;
-#find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} | sed 's/\.//g' |while read line;
 do
 # echo $line
  	if [ "$line" != "Sent" ] &&  [ "$line" != "Spam" ] && [ "$line" != "Drafts" ] && [ "$line" != "Junk" ] && [ "$line" != "Trash" ] && [ "$line" != "ur" ]
 	then
-		echo "Creating folder '$line'…"
-		/opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$line"
-		echo "Finished creating folder."
+	   if [[ "$line" == *"."* ]]
+	   then
+		folder=`echo $line |cut -d '.' -f1`
+        	subfolder=`echo $line|cut -d '.' -f2`
+	        #echo "Folder es: $folder"
+        	#echo "Sub folder es: $subfolder"
+		echo "Creating folder '/$folder'…"
+	        /opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$folder"
+        	echo "Creating subfolder '/$folder/$subfolder'…"
+        	/opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$folder/$subfolder"
+		#echo "Transferring folder… $folder"
+		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "$folder" "$path/.$folder/cur" 
+		echo "Transferring subfolder… $folder/$subfolder"
+		/opt/zimbra/bin/zmmailbox -z -m $user addMessage /"$folder/$subfolder" "$path/.$folder.$subfolder/cur" 
+	   fi
+           if [[ "$line" != *"."* ]] && [[ "$line" != "$folder" ]] && [[ "$line" != "$subfolder" ]]
+		then 
+		   if [[ "$line" != *"."* ]] && [[ "$line" != "$folder" ]]
+                       then
+			echo "Creating folder '$line'…"
+			/opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$line"
+			echo "Finished creating folder $line"
+		  fi
+	       fi
 	fi
 	if [ "$line" = "ur" ]
 	then
     		echo "Transferring inbox…"
-		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
-		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
-		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/cur"
-		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/new"
+		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
+		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
+		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/cur"
+		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/new"
 		echo "Finished transferring inbox."
 	else
-    		echo "Transferring inbox $line …"
-		/opt/zimbra/bin/zmmailbox -z -m $user addMessage $line "$path/$line/cur"
-                echo "Finished transferring $line ."
+	    if [[ "$line" != *"."* ]] && [[ "$line" != "Spam" ]]
+                then
+		  if [[ "$line" = "Sent" ]]
+		   then
+		   	echo "Transferring $line …"
+                   	/opt/zimbra/bin/zmmailbox -z -m $user addMessage $line "$path/.Sent Items/cur"
+                   	echo "Finished transferring $line ."
+	           else
+    		   	echo "Transferring $line …"
+		   	/opt/zimbra/bin/zmmailbox -z -m $user addMessage $line "$path/.$line/cur"
+                   echo "Finished transferring $line ."
+	        fi
+	   fi
 	fi
-
 done
