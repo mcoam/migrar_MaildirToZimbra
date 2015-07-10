@@ -17,8 +17,6 @@ do
 	        /opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$folder"
         	echo "Creating subfolder '/$folder/$subfolder'…"
         	/opt/zimbra/bin/zmmailbox -z -m $user createFolder /"$folder/$subfolder"
-		#echo "Transferring folder… $folder"
-		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "$folder" "$path/.$folder/cur" 
 		echo "Transferring subfolder… $folder/$subfolder"
 		/opt/zimbra/bin/zmmailbox -z -m $user addMessage /"$folder/$subfolder" "$path/.$folder.$subfolder/cur" 
 	   fi
@@ -37,8 +35,6 @@ do
     		echo "Transferring inbox…"
 		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
 		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
-		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/cur"
-		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/new"
 		echo "Finished transferring inbox."
 	else
 	    if [[ "$line" != *"."* ]] && [[ "$line" != "Spam" ]]
