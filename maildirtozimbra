@@ -35,8 +35,8 @@ do
 	if [ "$line" = "ur" ]
 	then
     		echo "Transferring inbox…"
-		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
-		#/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
+		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
+		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
 		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/cur"
 		##/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/.INBOX_*/new"
 		echo "Finished transferring inbox."
