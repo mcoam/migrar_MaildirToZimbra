@@ -14,7 +14,7 @@ do
  	if [ "$line" != "/Sent" ] &&  [ "$line" != "/Spam" ] && [ "$line" != "/Drafts" ] && [ "$line" != "/Junk" ] && [ "$line" != "/Trash" ] && [ "$line" != "cur" ] 
 	then
 	    echo "cf $line" >> $userfolder
-	    #echo "cf" > /tmp/borra 
+	    ##echo "cf" > /tmp/borra 
         fi
 done
 	#Creando carpetas
