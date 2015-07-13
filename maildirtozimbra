@@ -28,33 +28,26 @@ for msg in `ls $path'/'cur/ |sort `
     echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
  done 
 # #cargamos los correos del subdirectorio al zimbra
-  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+#  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
   echo "Finished transferring Inbox messages...."
 ###Fin sincroniza Inbox
 
 #Migrando data de directorios creados
-#while read line
-#do
-# folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
-# echo $folder
-# ##Sincronizando carpetas
-# for msg in `ls $path/.$folder'/'cur` 
-#   do
-#     if [[ "$folder" != *"."* ]]
-#     then
-#        echo "Transferring messages from directories...."
-#        echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
-#        #cargamos los correos del subdirectorio al zimbra
-#        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"$folder
-#        echo "Finished transferring messages from directories...."
-#     else
-# 	folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
-##        #echo $folderz
-#        echo "Transferring messages from directories...."
-#        echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
-#        #cargamos los correos del subdirectorio al zimbra
-#        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"$folder
-#        echo "Finished transferring messages from directories...."
-#     fi
-##   done
-#done < $userfolder
+while read line
+do
+ folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
+ echo $folder
+ ##Sincronizando carpetas
+ for msg in `ls $path/.$folder'/'cur` 
+   do
+     if [[ "$folder" != *"."* ]]
+     then
+        echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+        echo "Finished transferring messages from directories...."
+     else
+ 	folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
+        echo $folderz
+        echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+     fi
+   done
+done < $userfolder
