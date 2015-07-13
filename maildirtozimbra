@@ -3,74 +3,58 @@
 zmcmd="/opt/zimbra/bin/zmmailbox"
 path='/export8/mdir/1/5/mlopez@manquehue.net/Maildir'
 user=`echo $path |cut -d / -f6`
-usersubfolder="/var/tmp/$user.subfolder"
 userfolder="/var/tmp/$user.folder"
 
-#echo $userFolder
-
 #echo user
-find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | while read line;
-do
+#find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | while read line;
+#find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | sed 's/\./\//g' | while read line;
+find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} | sed 's/\./\//g' | while read line;
 # echo $line
- 	if [ "$line" != "Sent" ] &&  [ "$line" != "Spam" ] && [ "$line" != "Drafts" ] && [ "$line" != "Junk" ] && [ "$line" != "Trash" ] && [ "$line" != "ur" ]
+do
+ 	if [ "$line" != "/Sent" ] &&  [ "$line" != "/Spam" ] && [ "$line" != "/Drafts" ] && [ "$line" != "/Junk" ] && [ "$line" != "/Trash" ] && [ "$line" != "cur" ] 
 	then
-	   if [[ "$line" == *"."* ]]
-	   then
-		folder=`echo $line |cut -d '.' -f1` 
-        	subfolder=`echo $line|cut -d '.' -f2`
-	        echo "cf /$folder" >> $usersubfolder
-        	echo "cf /$folder/$subfolder" >> $usersubfolder
-		echo "Creating folder '/$folder' and '/$folder/$subfolder'" 
-		#crea carpetas con sub directorios
-	         $zmcmd -z -m $user < $usersubfolder
-		echo "Transferring subfolder ... $folder/$subfolder"
-		#listamos los correos del directorio
-	        for msg in `ls $path/.$folder.$subfolder'/'cur` 
-		do
-		   echo "addMessage /"$folder/$subfolder" "$path/.$folder.$subfolder/cur/$msg" " >> /var/tmp/$user"_mail_"$subfolder
-		#cargamos los correos del subdirectorio al zimbra
-		   $zmcmd -z -m $user < /var/tmp/$user"_mail_"$subfolder
-	       done
-	    fi
-#	     else
-#		echo "Creating folder '$line'..."
-#                       echo "cf /$line" >> $userfolder
-#                       $zmcmd -z -m $user < $userfolder
-#                       echo "Finished creating folder $line"
-#	   fi
-          # if [[ "$line" != *"."* ]] && [[ "$line" != "$folder" ]] && [[ "$line" != "$subfolder" ]]
-	#	then 
-	#		echo "Creating folder '$line'..."
-	#		echo "cf /$line" >> $userfolder
-	#		$zmcmd -z -m $user < $userfolder 1>&2
-	#		echo "Finished creating folder $line"
-		#listamos los correos del directorio
-#	        for msg in `ls $path/.$line'/'cur` 
-#		do
-#		   echo "addMessage /"$line" "$path/line/cur/$msg" " >> $foldermailid'_'$line
-#		   #$zmcmd -z -m $user < $foldermailid'_'$line
-#	       done
-	#   fi
-#	fi
-#	if [ "$line" = "ur" ]
-#	then
-#    		echo "Transferring inbox…"
-#		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/cur"
-#		/opt/zimbra/bin/zmmailbox -z -m $user addMessage "Inbox" "$path/new"
-#		echo "Finished transferring inbox."
-#	else
-#	    if [[ "$line" != *"."* ]] && [[ "$line" != "Spam" ]]
-#                then
-#		  if [[ "$line" = "Sent" ]]
-#		   then
-##		   	echo "Transferring $line …"
-##                   	/opt/zimbra/bin/zmmailbox -z -m $user addMessage $line "$path/.Sent Items/cur"
-##                   	echo "Finished transferring $line ."
-#	           else
-##    		   	echo "Transferring $line …"
-##		   	/opt/zimbra/bin/zmmailbox -z -m $user addMessage $line "$path/.$line/cur"
-##                   echo "Finished transferring $line ."
-#	        fi
-#	   fi
-	fi
+	    echo "cf $line" >> $userfolder
+	    #echo "cf" > /tmp/borra 
+        fi
 done
+	#Creando carpetas
+	echo "Creating folder"
+	$zmcmd -z -m $user < $userfolder
+
+##Sincronizando Inbox
+echo "Transferring Inbox messages...." 
+for msg in `ls $path'/'cur/ |sort `
+  do 
+    echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
+ done 
+# #cargamos los correos del subdirectorio al zimbra
+  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+  echo "Finished transferring Inbox messages...."
+###Fin sincroniza Inbox
+
+#Migrando data de directorios creados
+#while read line
+#do
+# folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
+# echo $folder
+# ##Sincronizando carpetas
+# for msg in `ls $path/.$folder'/'cur` 
+#   do
+#     if [[ "$folder" != *"."* ]]
+#     then
+#        echo "Transferring messages from directories...."
+#        echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+#        #cargamos los correos del subdirectorio al zimbra
+#        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"$folder
+#        echo "Finished transferring messages from directories...."
+#     else
+# 	folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
+##        #echo $folderz
+#        echo "Transferring messages from directories...."
+#        echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+#        #cargamos los correos del subdirectorio al zimbra
+#        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"$folder
+#        echo "Finished transferring messages from directories...."
+#     fi
+##   done
+#done < $userfolder
