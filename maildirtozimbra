@@ -28,26 +28,37 @@ for msg in `ls $path'/'cur/ |sort `
     echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
  done 
 # #cargamos los correos del subdirectorio al zimbra
-#  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
   echo "Finished transferring Inbox messages...."
 ###Fin sincroniza Inbox
 
 #Migrando data de directorios creados
+echo "Generating datafile from folder"
 while read line
 do
  folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
- echo $folder
+ #echo $folder
  ##Sincronizando carpetas
  for msg in `ls $path/.$folder'/'cur` 
    do
      if [[ "$folder" != *"."* ]]
      then
         echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
-        echo "Finished transferring messages from directories...."
      else
  	folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
-        echo $folderz
+        #echo $folderz
         echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
      fi
    done
 done < $userfolder
+echo "Finished datafile from subfolder"
+
+##Cargando data
+
+for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder` 
+  do
+     echo $a
+     echo "Start transferring messages from datafiles"
+     $zmcmd -z -m $user < $a
+     echo "Finished transferring messages from datafiles"
+  done
