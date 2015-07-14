@@ -6,6 +6,6 @@ El script hace lo siguiente:
 * Migra a cada uno de los directorios los correos
 
 ### Uso
-sh maildirtozimbra <user path>
-
-
+```ruby
+sh maildirtozimbra /export9/mdir/9/47/jpedreros@domain.com/Maildir
+``` 
