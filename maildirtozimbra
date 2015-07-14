@@ -6,8 +6,6 @@ user=`echo $path |cut -d / -f6`
 userfolder="/var/tmp/$user.folder"
 
 #echo user
-#find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | while read line;
-#find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} |sed 's/^.//g' | sed 's/\./\//g' | while read line;
 find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} | sed 's/\./\//g' | while read line;
 # echo $line
 do
@@ -50,17 +48,6 @@ else
 fi
 done
 #Fin sincroniza Inbox y Sent
-
-###Sincronizando Inbox Y Enviados
-#echo "Transferring Inbox messages...." 
-#for msg in `ls $path'/'cur/ |sort `
-#  do 
-#    echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
-# done 
-## #cargamos los correos del subdirectorio al zimbra
-#  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
-#  echo "Finished transferring Inbox messages...."
-####Fin sincroniza Inbox
 
 #Migrando data de directorios creados
 echo "Generating datafile from folder"
