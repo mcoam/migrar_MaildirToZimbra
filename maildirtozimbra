@@ -35,7 +35,7 @@ then
           echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
         done
         #cargamos los correos del subdirectorio al zimbra
-        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+        $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
         echo "Finished transferring Inbox messages...."
 else
     echo "Transferring Sent messages...." 
