@@ -14,23 +14,53 @@ do
  	if [ "$line" != "/Sent" ] &&  [ "$line" != "/Spam" ] && [ "$line" != "/Drafts" ] && [ "$line" != "/Junk" ] && [ "$line" != "/Trash" ] && [ "$line" != "cur" ] 
 	then
 	    echo "cf $line" >> $userfolder
-	    ##echo "cf" > /tmp/borra 
+	    #echo "cf" > /tmp/borra 
         fi
 done
 	#Creando carpetas
 	echo "Creating folder"
 	$zmcmd -z -m $user < $userfolder
 
-##Sincronizando Inbox
-echo "Transferring Inbox messages...." 
-for msg in `ls $path'/'cur/ |sort `
-  do 
-    echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
- done 
-# #cargamos los correos del subdirectorio al zimbra
-  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
-  echo "Finished transferring Inbox messages...."
-###Fin sincroniza Inbox
+dfolders=('Inbox' 'Sent')
+
+for index in ${dfolders[@]}
+do
+   echo $index
+##Sincronizando Inbox Y Enviados
+if [ "$index" = "Inbox" ]
+then
+   echo "Transferring Inbox messages...." 
+     for msg in `ls $path'/'cur/ |sort `
+       do
+          echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
+        done
+        #cargamos los correos del subdirectorio al zimbra
+        #$zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+        echo "Finished transferring Inbox messages...."
+else
+    echo "Transferring Sent messages...." 
+     for msg in `ls $path/'.Sent Items/cur/' |sort `
+       do
+   	#echo $msg
+          echo "addMessage "/Sent" "$path"/.Sent\ Items/cur/"$msg" " >> /var/tmp/$user"_mail_"Sent
+        done
+        #cargamos los correos del subdirectorio al zimbra
+        $zmcmd -z -m $user < /var/tmp/$user"_mail_"Sent
+        echo "Finished transferring Sent messages...."
+fi
+done
+#Fin sincroniza Inbox y Sent
+
+###Sincronizando Inbox Y Enviados
+#echo "Transferring Inbox messages...." 
+#for msg in `ls $path'/'cur/ |sort `
+#  do 
+#    echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
+# done 
+## #cargamos los correos del subdirectorio al zimbra
+#  $zmcmd -z -m $user < /var/tmp/$user"_mail_"Inbox
+#  echo "Finished transferring Inbox messages...."
+####Fin sincroniza Inbox
 
 #Migrando data de directorios creados
 echo "Generating datafile from folder"
@@ -54,8 +84,7 @@ done < $userfolder
 echo "Finished datafile from subfolder"
 
 ##Cargando data
-
-for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder` 
+for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder| grep -v Sent` 
   do
      echo $a
      echo "Start transferring messages from datafiles"
