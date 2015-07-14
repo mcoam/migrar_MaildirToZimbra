@@ -3,7 +3,7 @@
 El script hace lo siguiente:
 
 * Crea los directorios de usuario en la bandeja Zimbra
-* Migra a cada uno de los directorios los correos
+* Migra a cada uno de los directoios creados los correso respectivos
 
 ### Uso
 ```ruby
