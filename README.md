@@ -10,7 +10,7 @@ El script hace lo siguiente:
 time sh /usr/local/bin/maildirtozimbra jpedreros@domain.com
 ``` 
 ### Tiempos
-Casilla 1.2GB, 40.000 correos app.
+Casilla 1.2GB, 35.000 correos app.
 ```ruby
 real    32m56.311s
 user    6m5.190s
