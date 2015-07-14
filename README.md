@@ -7,7 +7,7 @@ El script hace lo siguiente:
 
 ### Uso
 ```ruby
-sh maildirtozimbra /export9/mdir/9/47/jpedreros@domain.com/Maildir
+time sh /usr/local/bin/maildirtozimbra jpedreros@domain.com
 ``` 
 ### Tiempos
 Casilla 1.2GB, 40.000 correos app.
