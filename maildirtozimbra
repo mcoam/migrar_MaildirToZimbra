@@ -10,13 +10,13 @@ zmcmd="/opt/zimbra/bin/zmmailbox"
 user=`echo $path |cut -d / -f6`
 userfolder="/var/tmp/$user.folder"
 
-#echo user
-find . -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $2'} | sed 's/\./\//g' | while read line;
+#echo $user
+find $path -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $8'} | sed 's/\./\//g' | while read line;
 # echo $line
 do
  	if [ "$line" != "/Sent" ] &&  [ "$line" != "/Spam" ] && [ "$line" != "/Drafts" ] && [ "$line" != "/Junk" ] && [ "$line" != "/Trash" ] && [ "$line" != "cur" ] && [ "$line" != "/sent" ]
 	then
-	    echo $line
+	    #echo $line
 	    echo "cf $line" >> $userfolder
 	    #echo "cf" > /tmp/borra 
         fi
