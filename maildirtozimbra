@@ -2,7 +2,7 @@
 
 param=$1
 path=`busca_user_nfs.sh $param`
-echo $path
+#echo $path
 
 zmcmd="/opt/zimbra/bin/zmmailbox"
 #path='/export8/mdir/1/5/mlopez@manquehue.net/Maildir'

@@ -10,9 +10,9 @@ El script hace lo siguiente:
 sh maildirtozimbra /export9/mdir/9/47/jpedreros@domain.com/Maildir
 ``` 
 ### Tiempos
-Casilla 1GB, 35.000 correos app.
+Casilla 1.2GB, 40.000 correos app.
 ```ruby
-real	39m29.042s
-user	5m23.760s
-sys	1m38.153s
+real    32m56.311s
+user    6m5.190s
+sys     1m23.848s
 ```
