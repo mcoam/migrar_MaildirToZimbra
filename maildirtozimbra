@@ -5,8 +5,6 @@ path=`busca_user_nfs.sh $param`
 #echo $path
 
 zmcmd="/opt/zimbra/bin/zmmailbox"
-#path='/export8/mdir/1/5/mlopez@manquehue.net/Maildir'
-#path='/export9/mdir/9/47/jpedreros@gtdinternet.com/Maildir'
 user=`echo $path |cut -d / -f6`
 userfolder="/var/tmp/$user.folder"
 
