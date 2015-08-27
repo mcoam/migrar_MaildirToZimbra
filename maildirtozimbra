@@ -54,8 +54,8 @@ then
           echo "addMessage "/Inbox" "$path'/new/'$msg" " >> /var/tmp/$user"_mail_"InboxNew
         done
         #cargamos los correos del subdirectorio al zimbra ##DESCOMENTAR## Comentando por que se demora mucho este inbox 
-        #$zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"Inbox
-        #$zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"InboxNew
+        $zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"Inbox
+        $zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"InboxNew
         echo -e "Transferencia de Bandeja de Entrada exitosa."
 else
     echo -e "Transfiriendo mensajes Bandeja Enviados...." 
@@ -101,3 +101,4 @@ for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder| grep -vi Sent`
      echo -ne "Termino migracion de data de directorios migrados"
   done
 
+touch /var/tmp/$user.MIGRADO
