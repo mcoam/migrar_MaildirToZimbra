@@ -101,4 +101,5 @@ for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder| grep -vi Sent`
      echo -ne "Termino migracion de data de directorios migrados"
   done
 
-touch /var/tmp/$user.MIGRADO
+mkdir /root/MIGRADO/
+touch /root/MIGRADO/$user.MIGRADO
