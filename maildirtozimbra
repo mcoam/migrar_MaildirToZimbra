@@ -13,12 +13,15 @@ userfolder="/var/tmp/$user.folder"
 #nombre de usuario antes el arroba
 user2=`echo $path |cut -d '@' -f1 |cut -d '/' -f6`
 dominio=`echo $path |cut -d '@' -f2 | cut -d '/' -f1`
+log=/root/cuentasMigradas.log
 
 #echo $user #-> nettester@manquehue.net
 #echo $userfolder #-> /var/tmp/nettester@manquehue.net.folder
 #echo $user2 #-> nettester
 #echo $dominio #->manquehue.net
 #echo "$user2@asukalangley.$dominio"
+
+echo -e "#Migrando cuenta: $user" >> $log 
 
 #busca el nombre de las carpetas del usuario que se le paso por parametro
 find $path -maxdepth 10 -type d -name cur | awk '{ print length($0),$0 | "sort -n"}' |awk '{print $2}'  |egrep -v '_' | sed '/^\s*$/d'  |awk -F '/' {'print $8'} | sed 's/\./\//g' | while read line;
@@ -33,72 +36,94 @@ do
         fi
 done
 	#Se crean las carpetas en el mailbox de Zimbra
-	echo -ne "Creando directorios en mailbox $user2@asukalangley.$dominio ...."
-	$zmcmd -z -m $user2@asukalangley.$dominio < $userfolder
-	echo -ne "Directorios creados exitosamente"
+        #Valido si hay carpetas por crear
+	valida1=`ls /var/tmp/$user.folder 2>/dev/null `
+ 	if [ "$valida1" = "" ]
+	then
+	    echo -e "No hay sub-carpetas a crear" >> $log
+	else
+	    echo -e "Creando sub-carpetas en mailbox $user2@asukalangley.$dominio ...."
+	    $zmcmd -z -m $user2@asukalangley.$dominio -f $userfolder
+	    echo -e "Sub-directorios creados exitosamente" >> $log
+	fi
 
+##Sincronizando Inbox Y Enviados
 #definimos carpetas Inbox y Sent dentro del arreglo
 dfolders=('Inbox' 'Sent')
 
 for index in ${dfolders[@]}
 do
    #echo $index
-##Sincronizando Inbox Y Enviados
 if [ "$index" = "Inbox" ]
 then
-   echo -e "Transfiriendo mensjaes de Bandeja de Entrada...." 
-     for msg in `ls $path'/'cur/ |sort `
+	echo -e "Transfiriendo mensajes de la Bandeja de entrada....." >> $log
+     	for msg in `ls $path'/'cur/ |sort `
 	#los correos quedan en un archivo que luego sera cargado por comando Ej: /var/tmp/nettester@manquehue.net_mail_Inbox
-       do
-          echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
-          echo "addMessage "/Inbox" "$path'/new/'$msg" " >> /var/tmp/$user"_mail_"InboxNew
-        done
-        #cargamos los correos del subdirectorio al zimbra ##DESCOMENTAR## Comentando por que se demora mucho este inbox 
-        $zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"Inbox
-        $zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"InboxNew
-        echo -e "Transferencia de Bandeja de Entrada exitosa."
-else
-    echo -e "Transfiriendo mensajes Bandeja Enviados...." 
+     do
+        echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
+        echo "addMessage "/Inbox" "$path'/new/'$msg" " >> /var/tmp/$user"_mail_"InboxNew
+     done
+     valida2=`ls /var/tmp/$user"_mail_"Inbox* 2>/dev/null`
+     if [ "$valida2" = "" ]
+     then
+        echo -e "No hay mensajes que migrar en la Bandeja de Entrada" >> $log
+     else
+        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Inbox >> /var/tmp/$user"_mail_"MIGRADOS
+        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"InboxNew >>  /var/tmp/$user"_mail_"MIGRADOS
+        echo -e "Transferencia de Bandeja de Entrada exitosa" >> $log
+     fi #cierra if de valida2
+    else
+     echo -e "Transfiriendo mensajes de bandeja Enviados..." >> $log
      for msg in `ls $path/'.Sent Items/cur/' |sort `
        do
    	#los correos quedan en un archivo que luego sera cargado por comando
-          echo "addMessage "/Sent" "$path"/.Sent\ Items/cur/"$msg" " >> /var/tmp/$user"_mail_"Sent
+          echo "addMessage "/Sent" "$path"/.Sent\ Items/cur/"$msg" " >> /var/tmp/$user"_mail_"Sent 
         done
         #cargamos los correos del subdirectorio al zimbra
-        $zmcmd -z -m $user2@asukalangley.$dominio < /var/tmp/$user"_mail_"Sent
-        echo -e "Transferencia de Bandeja Enviados exitosa."
-fi
-done
-#Fin sincroniza Inbox y Sent
+       valida3=`ls /var/tmp/$user"_mail_"Sent 2>/dev/null`
+       if [ "$valida3" = "" ]
+       then
+    	  echo -e "No hay mensajes que migrar en la bandeja de Enviados"  >> $log
+       else
+        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Sent >> /var/tmp/$user"_mail_"MIGRADOS
 
-#Migrando data de directorios creados en mailbox de Zimbra
-echo -ne "Generando la data de correos para carpetas migradas"
-while read line
-do
- folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
- #echo $folder
- ##Sincronizando carpetas
- for msg in `ls $path/.$folder'/'cur` 
-   do
-     if [[ "$folder" != *"."* ]]
-     then
-        echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
-     else
- 	folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
-        #echo $folderz
-        echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
-     fi
-   done
-done < $userfolder
-echo -ne "Termino de generar data de directorios migrados"
+#echo -e "Generando la data de correos para carpetas migradas"
+
+if [ "$valida1" = "" ]
+then
+   echo -e "No hay carpetas para migrar data" >> $log
+else
+   while read line
+    do
+      folder=`echo $line|cut -d " " -f2 | sed 's/^\///'g | sed 's/\//./g' `
+ 	#echo $folder
+ 	##Sincronizando carpetas
+ 	for msg in `ls $path/.$folder'/'cur` 
+   	do
+     	  if [[ "$folder" != *"."* ]]
+     	   then
+        	echo "addMessage "$folder" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+     	   else
+ 	   folderz=`echo $line| awk {'print $2'} |sed 's/\./\//g'`     
+           #echo $folderz
+        	echo "addMessage "$folderz" "$path/.$folder/cur/$msg" " >> /var/tmp/$user"_mail_"$folder
+    	 fi
+        done
+      done < $userfolder
+     echo -e "Fin de transferencia de correos de directorios migrados"  >> $log
 
 ###Cargando data
 for a in `ls /var/tmp/$user* |grep -v Inbox |grep -v folder| grep -vi Sent` 
   do
      #echo $a
-     echo -ne "Inicio migracion de data de directorios migrados"
-     $zmcmd -z -m $user2@asukalangley.$dominio < $a
-     echo -ne "Termino migracion de data de directorios migrados"
+     echo -e "Inicio carga de data de directorios migrados...."  >> $log
+     $zmcmd -z -m $user2@asukalangley.$dominio -f $a >>  /var/tmp/$user"_mail_"MIGRADOS 
+     echo -e "Termino carga de data de directorios migrados" >> $log
   done
 
-touch /root/MIGRADO/$user.MIGRADO
+fi #if del $res
+     fi 
+fi
+done
+echo -e "#Terminado: $user" >> $log
+exit 0
