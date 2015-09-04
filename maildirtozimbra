@@ -50,46 +50,46 @@ done
 
 ##Sincronizando Inbox Y Enviados
 ##definimos carpetas Inbox y Sent dentro del arreglo
-#dfolders=('Inbox' 'Sent')
-###
-#for index in ${dfolders[@]}
-#do
-##   #echo $index
-#   if [ "$index" = "Inbox" ]
-#    then
-#	echo -e "Transfiriendo mensajes de la Bandeja de entrada....." >> $log
-#     	for msg in `ls $path'/'cur/ |sort `
-#	#los correos quedan en un archivo que luego sera cargado por comando Ej: /var/tmp/nettester@manquehue.net_mail_Inbox
-#     do
-#        echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
-#        echo "addMessage "/Inbox" "$path'/new/'$msg" " >> /var/tmp/$user"_mail_"InboxNew
-#     done
-#     valida2=`ls /var/tmp/$user"_mail_"Inbox* 2>/dev/null`
-#     if [ "$valida2" = "" ]
-#     then
-#        echo -e "No hay mensajes que migrar en la Bandeja de Entrada" >> $log
-#     else
-#       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Inbox >> /var/tmp/$user"_mail_"MIGRADOS
-#       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"InboxNew >>  /var/tmp/$user"_mail_"MIGRADOS
-#        echo -e "Transferencia de Bandeja de Entrada exitosa" >> $log
-#     fi #cierra if de valida2
-#    else #si no es inbox es sent
-#     echo -e "Transfiriendo mensajes de bandeja Enviados..." >> $log
-#     for msg in `ls $path/'.Sent Items/cur/' |sort `
-#       do
-#   	#los correos quedan en un archivo que luego sera cargado por comando
-#          echo "addMessage "/Sent" "$path"/.Sent\ Items/cur/"$msg" " >> /var/tmp/$user"_mail_"Sent 
-#        done
-#        #cargamos los correos del subdirectorio al zimbra
-#       valida3=`ls /var/tmp/$user"_mail_"Sent 2>/dev/null`
-#       if [ "$valida3" = "" ]
-#       then
-#    	  echo -e "No hay mensajes que migrar en la bandeja de Enviados"  >> $log
-#       else
-#        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Sent >> /var/tmp/$user"_mail_"MIGRADOS
-#       fi #cierra valida3
-#  fi #cierra if del arreglo
-#done
+dfolders=('Inbox' 'Sent')
+##
+for index in ${dfolders[@]}
+do
+#   #echo $index
+   if [ "$index" = "Inbox" ]
+    then
+	echo -e "Transfiriendo mensajes de la Bandeja de entrada....." >> $log
+     	for msg in `ls $path'/'cur/ |sort `
+	#los correos quedan en un archivo que luego sera cargado por comando Ej: /var/tmp/nettester@manquehue.net_mail_Inbox
+     do
+        echo "addMessage "/Inbox" "$path'/cur/'$msg" " >> /var/tmp/$user"_mail_"Inbox
+        echo "addMessage "/Inbox" "$path'/new/'$msg" " >> /var/tmp/$user"_mail_"InboxNew
+     done
+     valida2=`ls /var/tmp/$user"_mail_"Inbox* 2>/dev/null`
+     if [ "$valida2" = "" ]
+     then
+        echo -e "No hay mensajes que migrar en la Bandeja de Entrada" >> $log
+     else
+       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Inbox >> /var/tmp/$user"_mail_"MIGRADOS
+       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"InboxNew >>  /var/tmp/$user"_mail_"MIGRADOS
+        echo -e "Transferencia de Bandeja de Entrada exitosa" >> $log
+     fi #cierra if de valida2
+    else #si no es inbox es sent
+     echo -e "Transfiriendo mensajes de bandeja Enviados..." >> $log
+     for msg in `ls $path/'.Sent Items/cur/' |sort `
+       do
+   	#los correos quedan en un archivo que luego sera cargado por comando
+          echo "addMessage "/Sent" "$path"/.Sent\ Items/cur/"$msg" " >> /var/tmp/$user"_mail_"Sent 
+        done
+        #cargamos los correos del subdirectorio al zimbra
+       valida3=`ls /var/tmp/$user"_mail_"Sent 2>/dev/null`
+       if [ "$valida3" = "" ]
+       then
+    	  echo -e "No hay mensajes que migrar en la bandeja de Enviados"  >> $log
+       else
+        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Sent >> /var/tmp/$user"_mail_"MIGRADOS
+       fi #cierra valida3
+  fi #cierra if del arreglo
+done
 ####Fin syn Inbox y Sent
 
 echo -e "Generando la data de correos para carpetas migradas" >> $log
