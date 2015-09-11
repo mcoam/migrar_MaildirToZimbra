@@ -20,7 +20,7 @@ correosMigrados="/var/tmp/$user.Migrados"
 #echo $userfolder #-> /var/tmp/nettester@manquehue.net.folder
 #echo $user2 #-> nettester
 #echo $dominio #->manquehue.net
-#echo "$user2@asukalangley.$dominio"
+#echo "$user2@chimuelo.$dominio"
 
 echo -e "#Migrando cuenta: $user" >> $log 
 
@@ -43,8 +43,8 @@ done
 	then
 	    echo -e "No hay sub-carpetas a crear" >> $log
 	else
-	    echo -e "Creando sub-carpetas en mailbox $user2@asukalangley.$dominio ...."
-	    $zmcmd -z -m $user2@asukalangley.$dominio -f $userfolder
+	    echo -e "Creando sub-carpetas en mailbox $user2@chimuelo.$dominio ...."
+	    $zmcmd -z -m $user2@chimuelo.$dominio -f $userfolder
 	    echo -e "Sub-directorios creados exitosamente" >> $log
       fi #ciera valida1
 
@@ -69,8 +69,8 @@ do
      then
         echo -e "No hay mensajes que migrar en la Bandeja de Entrada" >> $log
      else
-       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Inbox >> /var/tmp/$user"_mail_"MIGRADOS
-       $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"InboxNew >>  /var/tmp/$user"_mail_"MIGRADOS
+       $zmcmd -z -m $user2@chimuelo.$dominio -f /var/tmp/$user"_mail_"Inbox >> /var/tmp/$user"_mail_"MIGRADOS
+       $zmcmd -z -m $user2@chimuelo.$dominio -f /var/tmp/$user"_mail_"InboxNew >>  /var/tmp/$user"_mail_"MIGRADOS
         echo -e "Transferencia de Bandeja de Entrada exitosa" >> $log
      fi #cierra if de valida2
     else #si no es inbox es sent
@@ -86,7 +86,7 @@ do
        then
     	  echo -e "No hay mensajes que migrar en la bandeja de Enviados"  >> $log
        else
-        $zmcmd -z -m $user2@asukalangley.$dominio -f /var/tmp/$user"_mail_"Sent >> /var/tmp/$user"_mail_"MIGRADOS
+        $zmcmd -z -m $user2@chimuelo.$dominio -f /var/tmp/$user"_mail_"Sent >> /var/tmp/$user"_mail_"MIGRADOS
        fi #cierra valida3
   fi #cierra if del arreglo
 done
@@ -118,12 +118,13 @@ if [ "$valida1" = "" ] #abre if valida1
       done < $userfolder #cierra while
      echo -e "Termino de crear archivos con los correos de los subdirectorios"  >> $log
 #lista la subcarpetas para migrarles los correos
-ls /var/tmp/mlopez@manquehue.net* |egrep -v 'Inbox|folder|Sent|MIGRA|Subc' > /var/tmp/$user.Subcarpetas
+#ls /var/tmp/mlopez@manquehue.net* |egrep -v 'Inbox|folder|Sent|MIGRA|Subc' > /var/tmp/$user.Subcarpetas
+ls /var/tmp/$user* |egrep -v 'Inbox|folder|Sent|MIGRA|Subc' > /var/tmp/$user.Subcarpetas
 
 while read linea
 do
    echo -e "Inicio carga de correos de directorios migrados ...."  >> $log
-       $zmcmd -z -m $user2@asukalangley.$dominio -f $linea >>  /var/tmp/$user"_mail_"MIGRADOS
+       $zmcmd -z -m $user2@chimuelo.$dominio -f $linea >>  /var/tmp/$user"_mail_"MIGRADOS
    echo -e "Termino carga de correos de directorios migrados " >> $log
 done < /var/tmp/$user.Subcarpetas
 fi #cierra valida1
